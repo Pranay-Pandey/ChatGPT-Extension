@@ -1,0 +1,1 @@
+A Browser Extension to search for selected text direclty on Chat GPT
