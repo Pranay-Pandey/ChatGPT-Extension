@@ -1,0 +1,14 @@
+{
+    "manifest_version": 3,
+    "name": "GPT search",
+    "description": "Query everything you copy",
+    "version": "1.0",
+    "action": {
+      "default_popup": "hello.html"
+    },
+    "icons":
+    {
+      "128": "logo.png"
+    },
+    "permissions":["activeTab", "scripting"]
+}
