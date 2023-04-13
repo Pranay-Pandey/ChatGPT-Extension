@@ -2,12 +2,21 @@
 <html>
   <head>
     <title>GPT search</title>
-    
   </head>
-  <body style="align-items: center;">
-    <input type="text" id="prehold" name="textbox">
-    <Button id="holder" style="align-self: center;">Search</Button>
-    <input type="text" id="sufhold" name="textbox">
+  <body>
+    <label for="text-tab">Text</label>
+    <input type="radio" id="text-tab" name="tab" checked>
+    <label for="image-tab">Image</label>
+    <input type="radio" id="image-tab" name="tab">
+    <div id="text-input">
+      <input type="text" id="prehold" name="textbox">
+      <Button id="holder">Search</Button>
+      <input type="text" id="sufhold" name="textbox">
+    </div>
+    <div id="image-input" style="display: none;">
+      <input type="text" id="image-text">
+      <button id="image-search">Search</button>
+    </div>
     <script src="run.js"></script>
   </body>
 </html>

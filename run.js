@@ -13,24 +13,6 @@ function show_the_result(text)
     el.style.height = '95%';
     document.body.appendChild(el);
     el.select();
-
-    document.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        const selectedText = window.getSelection().toString();
-        const copiedText = selectedText ? selectedText : text;
-        const copyPrompt = window.prompt('Copy this text:', copiedText);
-        if (copyPrompt) {
-        const copyElement = document.createElement('textarea');
-        copyElement.style.position = 'fixed';
-        copyElement.style.opacity = '0';
-        copyElement.value = copyPrompt;
-        document.body.appendChild(copyElement);
-        copyElement.focus();
-        copyElement.select();
-        document.execCommand('copy');
-        document.body.removeChild(copyElement);
-        }
-    });
 }
 
 function OPENAI_CHATGPT(prompt, Model="gpt-3.5-turbo") {
@@ -43,11 +25,11 @@ function OPENAI_CHATGPT(prompt, Model="gpt-3.5-turbo") {
 
     const options = {
         method: 'POST',
-        headers: {
-            'content-type': 'application/json',
-            'X-RapidAPI-Key': '96a103486amsh35a9eb686eabfe9p1ed8cejsndc752a411ade',
-            'X-RapidAPI-Host': 'openai80.p.rapidapi.com'
-        },
+	headers: {
+		'content-type': 'application/json',
+		'X-RapidAPI-Key': '7663b9fc24msh9501edef505340fp13e8b0jsn43dc3a28f730',
+		'X-RapidAPI-Host': 'openai80.p.rapidapi.com'
+	},
         body: JSON.stringify(requestBody)
     };
     
@@ -85,11 +67,6 @@ function get_result_finer(Mess) {
         },
         body: '{"message":"'+ Mess+'"}'
     };
-
-    // const style = document.createElement('style');
-    // style.innerHTML = 'html, body { min-width: 400px; min-height: 400px; }';
-    // document.head.appendChild(style);
-
     fetch('https://chatgpt53.p.rapidapi.com/v1/chat/new/', options)
         .then(response => response.json())
         .then(response => {
@@ -107,8 +84,6 @@ function get_result_finer(Mess) {
 
         })
         .catch(error=>{
-            // console.error(error);
-            // show_the_result(error);
             get_chat_gpt_response(Mess);
     });
 }
@@ -129,7 +104,6 @@ function get_chat_gpt_response(prompt){
         .then(response => {
             let result = response;
             if (response && response.content) {
-                // rest of the code
                 result = response.content;
             }
             else {
@@ -138,10 +112,6 @@ function get_chat_gpt_response(prompt){
             show_the_result(result);
         })
         .catch(error => {
-            // show_the_result(error);
-            // console.error(error);
-            // handle the error as necessary
-            // you can also call the function again here if you want to retry the request
             chat_GPT_OPEN_AI_NLP(prompt);
         });
 }
@@ -203,7 +173,6 @@ function chat_GPT_OPEN_AI_NLP(prompt)
         .then(response => {
             let result = response;
             if (response && response.answer) {
-                // rest of the code
                 result = response.answer;
             }
             else
@@ -220,38 +189,93 @@ var suffix = SuffixTextHolder.value;
 
 //Handler to receive the selected text
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-
-    //get Text
     let text = request.selectedText;
 
     let prefix = PrefixTextHolder.value;
     let suffix = SuffixTextHolder.value;
-    // text = text.replace(/\n/g, "").toString()
-    // alert(prefix+" "+ text.replace(/\n/g, "").toString() +" "+ suffix);
     OPENAI_CHATGPT(prefix+" "+ text +" "+ suffix);
 
 })
 
+function showSelection() {
+    selectedText = window.getSelection().toString();
+    chrome.runtime.sendMessage({selectedText});
+}
+
 Button.addEventListener("click", async ()=> {
+
+    let [tab] = await chrome.tabs.query({active: true, currentWindow: true});
+if (!tab.url.startsWith('chrome://') && !tab.url.startsWith('edge://')) {
+  chrome.scripting.executeScript({
+    target: {tabId: tab.id},
+    func: showSelection,
+  });
+} else {
+  alert('Cannot execute content script on internal pages.');
+}
+
     
-    // Get current Active tab
-    let [tab] = await chrome.tabs.query({active:
-    true, currentWindow: true});
-    // prefix = PrefixTextHolder.value;
-    // suffix = SuffixTextHolder.value;
-    chrome.scripting.executeScript({
-        target: {tabId: tab.id},
-        func: showSelection,
-    })
 })
 
-function showSelection() {
-    // alert('hi');
-    selectedText = window.getSelection().toString();
-    // if (selectedText!=''){
-    //     Button.innerText = selectedText;
-    // }
-    // alert( selectedText);
-    chrome.runtime.sendMessage({selectedText});
+
+
+let textTab = document.getElementById('text-tab');
+let imageTab = document.getElementById('image-tab');
+let textInput = document.getElementById('text-input');
+let imageInput = document.getElementById('image-input');
+let imageSearchButton = document.getElementById('image-search');
+let imageTextInput = document.getElementById('image-text');
+
+textTab.addEventListener('click', function() {
+  textInput.style.display = 'block';
+  imageInput.style.display = 'none';
+});
+
+imageTab.addEventListener('click', function() {
+  textInput.style.display = 'none';
+  imageInput.style.display = 'block';
+});
+
+imageSearchButton.addEventListener('click', function() {
+    alert("Generating Images");
+    get_image_from_text(imageTextInput.value)
+  });
+
+function add_image(url)
+{
+    let imageEl = document.createElement('img');
+    imageEl.src = url;
+    imageEl.style.width = '200px';
+    imageEl.style.height = 'auto';
+    imageEl.style.marginTop = '10px';
+    document.body.insertBefore(imageEl, imageInput.nextSibling);
+}
+
+function get_image_from_text(prompt){
+    const json_Object = {
+        "prompt": prompt,
+        "n": 2,
+        "size": "1024x1024"
+    }
+    const options = {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json',
+            'X-RapidAPI-Key': '7663b9fc24msh9501edef505340fp13e8b0jsn43dc3a28f730',
+            'X-RapidAPI-Host': 'openai80.p.rapidapi.com'
+        },
+	body: JSON.stringify(json_Object)
+};
+
+fetch('https://openai80.p.rapidapi.com/images/generations', options)
+	.then(response => response.json())
+	.then(response => {
+        if (response && response.data && response.data.length > 0) {
+            response.data.forEach(image => {
+                add_image(image.url);
+            });
+        }
+    })
+	.catch(err => {show_the_result(err);alert(err)});
 }
 
